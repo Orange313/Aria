@@ -29,9 +29,9 @@ public:
     ioStopFlag.store(false);
     LOG(INFO) << "Coordinator initializes " << context.worker_num
               << " workers.";
-    workers = WorkerFactory::create_workers(id, db, context, workerStopFlag);
+    workers = WorkerFactory::create_workers(id, db, context, workerStopFlag);//创建工作线程
 
-    // init sockets vector
+    // init sockets vector初始化套接字，为每个IO线程分配套接字
     inSockets.resize(context.io_thread_num);
     outSockets.resize(context.io_thread_num);
 
@@ -54,19 +54,19 @@ public:
     std::vector<std::thread> iDispatcherThreads, oDispatcherThreads;
 
     for (auto i = 0u; i < context.io_thread_num; i++) {
-
+      //创建输入和输出调度器
       iDispatchers[i] = std::make_unique<IncomingDispatcher>(
           id, i, context.io_thread_num, inSockets[i], workers, in_queue,
           ioStopFlag);
       oDispatchers[i] = std::make_unique<OutgoingDispatcher>(
           id, i, context.io_thread_num, outSockets[i], workers, out_queue,
           ioStopFlag);
-
+      //启动分发器线程
       iDispatcherThreads.emplace_back(&IncomingDispatcher::start,
                                       iDispatchers[i].get());
       oDispatcherThreads.emplace_back(&OutgoingDispatcher::start,
                                       oDispatchers[i].get());
-      if (context.cpu_affinity) {
+      if (context.cpu_affinity) {//绑定CPU核心
         pin_thread_to_core(iDispatcherThreads[i]);
         pin_thread_to_core(oDispatcherThreads[i]);
       }
@@ -74,7 +74,7 @@ public:
 
     std::vector<std::thread> threads;
 
-    LOG(INFO) << "Coordinator starts to run " << workers.size() << " workers.";
+    LOG(INFO) << "Coordinator starts to run " << workers.size() << " workers.";//性能统计输出
 
     for (auto i = 0u; i < workers.size(); i++) {
       threads.emplace_back(&Worker::start, workers[i].get());
@@ -192,7 +192,7 @@ public:
     LOG(INFO) << "Coordinator exits.";
   }
 
-  void connectToPeers() {
+  void connectToPeers() {//与节点建立连接
 
     // single node test mode
     if (peers.size() == 1) {
@@ -289,7 +289,7 @@ public:
     LOG(INFO) << "Coordinator " << id << " connected to all peers.";
   }
 
-  double gather(double value) {
+  double gather(double value) {//数据汇总，收集所有节点上的提交事务数
 
     auto init_message = [](Message *message, std::size_t coordinator_id,
                            std::size_t dest_node_id) {

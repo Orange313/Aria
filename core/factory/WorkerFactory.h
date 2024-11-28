@@ -38,13 +38,14 @@
 #include "protocol/Pwv/PwvManager.h"
 #include "protocol/Pwv/PwvTransaction.h"
 
+//根据不同的事务处理协议创建相应的Worker和Manager对象，组合成一组工作线程
 #include <unordered_set>
 
 namespace aria {
 
 template <class Context> class InferType {};
 
-template <> class InferType<aria::tpcc::Context> {
+template <> class InferType<aria::tpcc::Context> {//对InferType类进行模板特化
 public:
   template <class Transaction>
   using WorkloadType = aria::tpcc::Workload<Transaction>;
@@ -69,7 +70,7 @@ public:
         "Calvin", "Bohm",   "Aria",   "AriaFB", "Pwv"};
     CHECK(protocols.count(context.protocol) == 1);
 
-    std::vector<std::shared_ptr<Worker>> workers;
+    std::vector<std::shared_ptr<Worker>> workers; //返回一个向量，用于管理多个并发执行的事务。
 
     if (context.protocol == "TwoPL") {
 
