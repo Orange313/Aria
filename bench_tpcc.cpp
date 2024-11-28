@@ -19,10 +19,10 @@ int main(int argc, char *argv[]) {
   aria::tpcc::Context context;
   SETUP_CONTEXT(context);
 
-  context.operation_replication = FLAGS_operation_replication;
+  context.operation_replication = FLAGS_operation_replication;//根据FLAGS_query选择不同的TPCCWorkloadType
 
   if (FLAGS_query == "mixed") {
-    context.workloadType = aria::tpcc::TPCCWorkloadType::MIXED;
+    context.workloadType = aria::tpcc::TPCCWorkloadType::MIXED;//neworder+payment
   } else if (FLAGS_query == "neworder") {
     context.workloadType = aria::tpcc::TPCCWorkloadType::NEW_ORDER_ONLY;
   } else if (FLAGS_query == "payment") {
@@ -37,11 +37,11 @@ int main(int argc, char *argv[]) {
   context.write_to_w_ytd = FLAGS_write_to_w_ytd;
   context.payment_look_up = FLAGS_payment_look_up;
 
-  aria::tpcc::Database db;
+  aria::tpcc::Database db; //初始化
   db.initialize(context);
 
-  aria::Coordinator c(FLAGS_id, db, context);
-  c.connectToPeers();
+  aria::Coordinator c(FLAGS_id, db, context);//初始化统筹器
+  c.connectToPeers();//连接多机
   c.start();
   return 0;
 }
