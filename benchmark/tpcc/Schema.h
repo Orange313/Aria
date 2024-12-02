@@ -16,7 +16,7 @@ namespace tpcc {
 static constexpr std::size_t __BASE_COUNTER__ = __COUNTER__ + 1;
 }
 } // namespace aria
-
+//批量定义结构体字段
 #undef NAMESPACE_FIELDS
 #define NAMESPACE_FIELDS(x) x(aria) x(tpcc)
 

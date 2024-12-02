@@ -29,7 +29,7 @@ public:
     that.bytes_read = 0;
     that.bytes_total = 0;
   }
-
+  //移动构造函数，将that的成员变量赋值给本对象，并将that的成员变量置为nullptr
   BufferedReader &operator=(BufferedReader &&that) {
     socket = that.socket;
     bytes_read = that.bytes_read;

@@ -63,11 +63,11 @@ public:
 
     ExecutorStatus status = wait4_signal();
     DCHECK(status == ExecutorStatus::START);
-    n_completed_workers.store(0);
-    n_started_workers.store(0);
+    n_completed_workers.store(0);//重置已完成线程计数
+    n_started_workers.store(0);//重置已启动线程计数
     set_worker_status(ExecutorStatus::START);
     wait_all_workers_start();
-    wait4_stop(1);
+    wait4_stop(1);//等待1个协调者节点停止
     set_worker_status(ExecutorStatus::STOP);
     wait_all_workers_finish();
     broadcast_stop();
@@ -82,7 +82,7 @@ public:
   void wait_all_workers_finish() {
     std::size_t n_workers = context.worker_num;
     // wait for all workers to finish
-    while (n_completed_workers.load() < n_workers) {
+    while (n_completed_workers.load() < n_workers) {// 如果工作线程未完成，则主动让出 CPU 执行权，避免占用过多 CPU 时间
       // change to nop_pause()?
       std::this_thread::yield();
     }
@@ -101,7 +101,7 @@ public:
     worker_status.store(static_cast<uint32_t>(status));
   }
 
-  void signal_worker(ExecutorStatus status) {
+  void signal_worker(ExecutorStatus status) {//用于协调者发送信号给其他节点
 
     // only the coordinator node calls this function
     DCHECK(coordinator_id == 0);
@@ -119,7 +119,7 @@ public:
   }
 
   ExecutorStatus wait4_signal() {
-    // only non-coordinator calls this function
+    // only non-coordinator calls this function非协调者
     DCHECK(coordinator_id != 0);
 
     signal_in_queue.wait_till_non_empty();
@@ -152,16 +152,16 @@ public:
 
       std::unique_ptr<Message> message(stop_in_queue.front());
       bool ok = stop_in_queue.pop();
-      CHECK(ok);
+      CHECK(ok);//确保弹出成功
 
       CHECK(message->get_message_count() == 1);
 
       MessagePiece messagePiece = *(message->begin());
       auto type = static_cast<ControlMessage>(messagePiece.get_message_type());
-      CHECK(type == ControlMessage::STOP);
+      CHECK(type == ControlMessage::STOP);// 确保消息类型是 STOP
     }
   }
-
+// 等待接收 ACK (确认) 消息
   void wait4_ack() {
 
     std::chrono::steady_clock::time_point start;
@@ -235,7 +235,7 @@ public:
     }
   }
 
-  void push_message(Message *message) override {
+  void push_message(Message *message) override {//将收到的消息推送到消息队列
 
     // message will only be of type signal, C_PHASE_ACK or S_PHASE_ACK
 
@@ -271,11 +271,11 @@ public:
 
     Message *message = out_queue.front();
 
-    if (delay->delay_enabled()) {
+    if (delay->delay_enabled()) {//如果启用了消息延迟
       auto now = std::chrono::steady_clock::now();
       if (std::chrono::duration_cast<std::chrono::microseconds>(now -
                                                                 message->time)
-              .count() < delay->message_delay()) {
+              .count() < delay->message_delay()) {//时间未达到预定延迟时间
         return nullptr;
       }
     }
@@ -287,7 +287,7 @@ public:
   }
 
 protected:
-  void flush_messages() {
+  void flush_messages() {//将消息从各个协调者的消息存储中推送到输出队列中
 
     for (auto i = 0u; i < messages.size(); i++) {
       if (i == coordinator_id) {

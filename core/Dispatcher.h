@@ -53,7 +53,7 @@ public:
           continue;
         }
 
-        auto message = buffered_readers[i].next_message();
+        auto message = buffered_readers[i].next_message();//获取下一条消息
 
         if (message == nullptr) {
           std::this_thread::yield();
@@ -69,7 +69,7 @@ public:
           continue;
         }
 
-        auto workerId = message->get_worker_id();
+        auto workerId = message->get_worker_id();//消息来自某个worker
         CHECK(workerId % io_thread_num == group_id);
         // release the unique ptr
         workers[workerId]->push_message(message.release());

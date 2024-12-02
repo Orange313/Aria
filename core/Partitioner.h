@@ -97,7 +97,7 @@ public:
   PrimaryBackupPartitioner(std::size_t coordinator_id,
                            std::size_t coordinator_num)
       : Partitioner(coordinator_id, coordinator_num) {
-    CHECK(coordinator_num == 2);
+    CHECK(coordinator_num == 2);//该分区适用两个协调者
   }
 
   ~PrimaryBackupPartitioner() override = default;

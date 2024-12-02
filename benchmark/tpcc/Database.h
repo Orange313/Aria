@@ -39,12 +39,12 @@ public:
     return tbl_vecs[table_id][partition_id];
   }
 
-  ITable *tbl_warehouse(std::size_t partition_id) {
+  ITable *tbl_warehouse(std::size_t partition_id) {//获取仓库表
     DCHECK(partition_id < tbl_warehouse_vec.size());
     return tbl_warehouse_vec[partition_id].get();
   }
 
-  ITable *tbl_district(std::size_t partition_id) {
+  ITable *tbl_district(std::size_t partition_id) {//获取分区表
     DCHECK(partition_id < tbl_district_vec.size());
     return tbl_district_vec[partition_id].get();
   }
@@ -74,17 +74,17 @@ public:
     return tbl_order_vec[partition_id].get();
   }
 
-  ITable *tbl_order_line(std::size_t partition_id) {
+  ITable *tbl_order_line(std::size_t partition_id) {//订单行表
     DCHECK(partition_id < tbl_order_line_vec.size());
     return tbl_order_line_vec[partition_id].get();
   }
 
-  ITable *tbl_item(std::size_t partition_id) {
+  ITable *tbl_item(std::size_t partition_id) {//商品表
     DCHECK(partition_id < tbl_item_vec.size());
     return tbl_item_vec[partition_id].get();
   }
 
-  ITable *tbl_stock(std::size_t partition_id) {
+  ITable *tbl_stock(std::size_t partition_id) {//根据分区id获取库存表
     DCHECK(partition_id < tbl_stock_vec.size());
     return tbl_stock_vec[partition_id].get();
   }
@@ -99,7 +99,7 @@ public:
     for (auto i = 0u; i < partitionNum; i++) {
       if (partitioner == nullptr ||
           partitioner->is_partition_replicated_on_me(i)) {
-        all_parts.push_back(i);
+        all_parts.push_back(i);// 添加分区 ID 到 all_parts 列表
       }
     }
 
@@ -135,11 +135,11 @@ public:
     auto now = std::chrono::steady_clock::now();
 
     LOG(INFO) << "creating hash tables for database...";
-
+     // 依次为每个表创建哈希表实例
     for (auto partitionID = 0u; partitionID < partitionNum; partitionID++) {
       auto warehouseTableID = warehouse::tableID;
       tbl_warehouse_vec.push_back(
-          TableFactory::create_table<997, warehouse::key, warehouse::value>(
+          TableFactory::create_table<997, warehouse::key, warehouse::value>(//选择997素数减少哈希冲突
               context, warehouseTableID, partitionID));
 
       auto districtTableID = district::tableID;
@@ -190,7 +190,7 @@ public:
     // there are 10 tables in tpcc
     tbl_vecs.resize(10);
 
-    auto tFunc = [](std::unique_ptr<ITable> &table) { return table.get(); };
+    auto tFunc = [](std::unique_ptr<ITable> &table) { return table.get(); };//提取不同表的裸指针并存储
 
     std::transform(tbl_warehouse_vec.begin(), tbl_warehouse_vec.end(),
                    std::back_inserter(tbl_vecs[0]), tFunc);
@@ -221,7 +221,7 @@ public:
                << " milliseconds.";
 
     using std::placeholders::_1;
-    initTables(
+    initTables(//初始化表
         "warehouse",
         [&context, this](std::size_t partitionID) {
           warehouseInit(context, partitionID);
@@ -284,22 +284,22 @@ public:
     Decoder dec(operation.data);
     bool is_neworder;
     dec >> is_neworder;
-
+    //处理新订单
     if (is_neworder) {
       // district
       auto districtTableID = district::tableID;
       district::key district_key;
-      dec >> district_key.D_W_ID >> district_key.D_ID;
+      dec >> district_key.D_W_ID >> district_key.D_ID;//读取主键
 
       auto row =
-          tbl_district_vec[district_key.D_W_ID - 1]->search(&district_key);
+          tbl_district_vec[district_key.D_W_ID - 1]->search(&district_key);//根据主键查找
       MetaDataType &tid = *std::get<0>(row);
       tid.store(operation.tid);
       district::value &district_value =
           *static_cast<district::value *>(std::get<1>(row));
       dec >> district_value.D_NEXT_O_ID;
 
-      // stock
+      // stock库存
       auto stockTableID = stock::tableID;
       while (dec.size() > 0) {
         stock::key stock_key;
@@ -312,7 +312,7 @@ public:
             *static_cast<stock::value *>(std::get<1>(row));
 
         dec >> stock_value.S_QUANTITY >> stock_value.S_YTD >>
-            stock_value.S_ORDER_CNT >> stock_value.S_REMOTE_CNT;
+            stock_value.S_ORDER_CNT >> stock_value.S_REMOTE_CNT;//依次解码并存储
       }
     } else {
       {

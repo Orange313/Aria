@@ -57,7 +57,7 @@ public:
     return assign(str, str.length());
   }
 
-  FixedString &assign(const std::string &str, size_type length) {
+  FixedString &assign(const std::string &str, size_type length) {//赋值
     DCHECK(length <= str.length());
     DCHECK(length <= N);
     std::copy(str.begin(), str.begin() + length, data_.begin());

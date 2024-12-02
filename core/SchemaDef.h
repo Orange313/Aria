@@ -34,7 +34,7 @@
 
 #define STRUCT_FIELDPOS_X(type, name) name##_field,
 
-// the main macro
+// the main macro自动生成结构体
 #define DO_STRUCT(name, keyfields, valuefields, namespacefields)               \
   namespacefields(NAMESPACE_OPEN) struct name {                                \
     struct key {                                                               \

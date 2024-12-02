@@ -133,7 +133,7 @@ public:
                 << 100.0 * n_si_in_serializable / n_commit << " %"
                 << ", local: " << 100.0 * n_local / n_commit << " %";
       count++;
-      if (count > warmup && count <= timeToRun - cooldown) {
+      if (count > warmup && count <= timeToRun - cooldown) {//累计有效时间
         total_commit += n_commit;
         total_abort_no_retry += n_abort_no_retry;
         total_abort_lock += n_abort_lock;
@@ -212,7 +212,7 @@ public:
     for (auto i = 0u; i < context.io_thread_num; i++) {
 
       listenerThreads.emplace_back(
-          [id = this->id, peers = this->peers, &inSockets = this->inSockets[i],
+          [id = this->id, peers = this->peers, &inSockets = this->inSockets[i],//insocket存储来自其他节点的连接
            &getAddressPort,
            tcp_quick_ack = context.tcp_quick_ack](std::size_t listener_id) {
             std::vector<std::string> addressPort = getAddressPort(peers[id]);
@@ -293,8 +293,8 @@ public:
 
     auto init_message = [](Message *message, std::size_t coordinator_id,
                            std::size_t dest_node_id) {
-      message->set_source_node_id(coordinator_id);
-      message->set_dest_node_id(dest_node_id);
+      message->set_source_node_id(coordinator_id);//设置来源节点
+      message->set_dest_node_id(dest_node_id);//设置目标节点
       message->set_worker_id(0);
     };
 
@@ -303,8 +303,8 @@ public:
     if (id == 0) {
       for (std::size_t i = 0; i < coordinator_num - 1; i++) {
 
-        in_queue.wait_till_non_empty();
-        std::unique_ptr<Message> message(in_queue.front());
+        in_queue.wait_till_non_empty();//等待直到输入队列有消息
+        std::unique_ptr<Message> message(in_queue.front());//获取第一个消息
         bool ok = in_queue.pop();
         CHECK(ok);
         CHECK(message->get_message_count() == 1);
@@ -315,13 +315,13 @@ public:
               static_cast<uint32_t>(ControlMessage::STATISTICS));
         CHECK(messagePiece.get_message_length() ==
               MessagePiece::get_header_size() + sizeof(double));
-        Decoder dec(messagePiece.toStringPiece());
+        Decoder dec(messagePiece.toStringPiece());//解码消息
         double v;
         dec >> v;
         sum += v;
       }
 
-    } else {
+    } else {//非协调器节点
       auto message = std::make_unique<Message>();
       init_message(message.get(), id, 0);
       ControlMessageFactory::new_statistics_message(*message, value);

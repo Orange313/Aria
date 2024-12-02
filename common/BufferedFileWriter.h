@@ -15,7 +15,7 @@ class BufferedFileWriter {
 public:
   BufferedFileWriter(const char *filename) {
     fd = open(filename, O_WRONLY | O_CREAT,
-              S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+              S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);//只写，不存在就创建，文件权限，允许用户、组和其他用户读写文件。
     CHECK(fd >= 0);
     bytes_total = 0;
   }
@@ -27,13 +27,13 @@ public:
       bytes_total += size;
       return;
     }
-
+    //缓冲区即将满，计算剩余空间，将缓冲区数据写入文件，然后将剩余数据写入缓冲区
     auto copy_size = BUFFER_SIZE - bytes_total;
 
     memcpy(buffer + bytes_total, str, copy_size);
     bytes_total += copy_size;
     flush();
-
+    //处理剩余数据
     str += copy_size;
     size -= copy_size;
 
