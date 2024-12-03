@@ -18,12 +18,12 @@ template <class T> class Percentile {
 public:
   using element_type = T;
 
-  void add(const element_type &value) {
+  void add(const element_type &value) {//单个数据
     isSorted_ = false;
     data_.push_back(value);
   }
 
-  void add(const std::vector<element_type> &v) {
+  void add(const std::vector<element_type> &v) {//批量数据
     isSorted_ = false;
     std::copy(v.begin(), v.end(), std::back_inserter(data_));
   }
@@ -34,7 +34,7 @@ public:
   }
 
   auto size() { return data_.size(); }
-
+  //计算分位数，根据最近排序法
   element_type nth(double n) {
     if (data_.size() == 0) {
       return 0;
@@ -47,7 +47,7 @@ public:
     return data_[i];
   }
 
-  void save_cdf(const std::string &path) {
+  void save_cdf(const std::string &path) { //保存累积分布函数
     if (data_.size() == 0) {
       return;
     }

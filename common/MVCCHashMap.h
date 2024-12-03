@@ -84,7 +84,7 @@ public:
         bucket_number(key));
   }
 
-  // remove a particular key with a specific version.
+  // remove a particular key with a specific version.删除指定版本的key
   bool remove_key_version(const KeyType &key, uint64_t version) {
     return apply(
         [&key, version](HashMapType &map) {
@@ -132,7 +132,7 @@ public:
         bucket_number(key));
   }
 
-  // return the number of versions of a particular key
+  // return the number of versions of a particular key查询键的版本数量
   std::size_t version_count(const KeyType &key) {
     return apply(
         [&key](HashMapType &map) -> std::size_t {
@@ -186,7 +186,7 @@ public:
         bucket_number(key));
   }
 
-  // remove all versions less than or equal to vacuum_version
+  // remove all versions less than or equal to vacuum_version垃圾回收
   std::size_t vacuum_key_versions(const KeyType &key, uint64_t vacuum_version) {
     return apply(
         [&key, vacuum_version](HashMapType &map) -> std::size_t {

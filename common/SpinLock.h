@@ -13,8 +13,8 @@ public:
   // constructors
   SpinLock() = default;
 
-  SpinLock(const SpinLock &) = delete;            // non construction-copyable
-  SpinLock &operator=(const SpinLock &) = delete; // non copyable
+  SpinLock(const SpinLock &) = delete;            // non construction-copyable禁止复制
+  SpinLock &operator=(const SpinLock &) = delete; // non copyable禁止赋值
 
   // Modifiers
   void lock() {
@@ -24,7 +24,7 @@ public:
 
   void unlock() { lock_.clear(std::memory_order_release); }
 
-  // friend declaration
+  // friend declaration友元函数
   friend std::ostream &operator<<(std::ostream &, const SpinLock &);
 
 private:

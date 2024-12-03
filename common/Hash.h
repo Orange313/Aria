@@ -10,7 +10,7 @@ namespace aria {
 
 template <typename T>
 inline std::size_t hash_combine(const T &v1, const T &v2) {
-  return v2 ^ (v1 + 0x9e3779b9 + (v2 << 6) + (v2 >> 2));
+  return v2 ^ (v1 + 0x9e3779b9 + (v2 << 6) + (v2 >> 2));//0x9e3779b9
 }
 
 template <typename T> inline std::size_t hash(const T &v) {

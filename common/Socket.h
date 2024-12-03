@@ -29,7 +29,7 @@ public:
   // Socket is not copyable
   Socket(const Socket &) = delete;
 
-  Socket &operator=(const Socket &) = delete;
+  Socket &operator=(const Socket &) = delete;//Socket is not assignable
 
   // Socket is movable
   Socket(Socket &&that) {
@@ -49,7 +49,7 @@ public:
     return *this;
   }
 
-  int connect(const char *addr, int port) {
+  int connect(const char *addr, int port) {//connect to remote host 
     DCHECK(fd >= 0);
     sockaddr_in serv = make_endpoint(addr, port);
     return ::connect(fd, (const sockaddr *)(&serv), sizeof(serv));
@@ -63,7 +63,7 @@ public:
     CHECK(res >= 0);
   }
 
-  void set_quick_ack_flag(bool quick_ack) { this->quick_ack = quick_ack; }
+  void set_quick_ack_flag(bool quick_ack) { this->quick_ack = quick_ack; }//set quick ack flag
 
   void try_quick_ack() {
 #ifndef __APPLE__
@@ -81,7 +81,7 @@ public:
     return ::close(fd);
   }
 
-  long read_n_bytes(char *buf, long size) {
+  long read_n_bytes(char *buf, long size) {//read n bytes from socket synchronously
     DCHECK(fd >= 0);
     long n = 0;
     while (n < size) {
@@ -95,7 +95,7 @@ public:
     return n;
   }
 
-  long read_n_bytes_async(char *buf, long size) {
+  long read_n_bytes_async(char *buf, long size) {//read n bytes from socket asynchronously
     DCHECK(fd >= 0);
     long n = 0;
     while (n < size) {
@@ -125,7 +125,7 @@ public:
     }
     return n;
   }
-
+//read and write number of type T
   template <class T> long write_number(const T &n) {
     DCHECK(fd >= 0);
     return write_n_bytes(reinterpret_cast<const char *>(&n), sizeof(T));
@@ -140,7 +140,7 @@ public:
     DCHECK(fd >= 0);
     return read_n_bytes_async(reinterpret_cast<char *>(&n), sizeof(T));
   }
-
+  //bottom-level read and write functions
   long read(char *buf, long size) {
     DCHECK(fd >= 0);
     if (size > 0) {
@@ -168,7 +168,7 @@ public:
     }
     return 0;
   }
-
+//generate endpoint from address and port
   static sockaddr_in make_endpoint(const char *addr, int port) {
     sockaddr_in serv;
     memset(&serv, 0, sizeof(serv));
@@ -183,7 +183,7 @@ private:
   bool quick_ack = false;
   int fd;
 };
-
+//Listener class for listening to incoming connections
 class Listener {
 public:
   Listener(const char *addr, int port, int max_connections) {

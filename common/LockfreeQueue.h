@@ -29,7 +29,7 @@ public:
       boost::lockfree::spsc_queue<T, boost::lockfree::capacity<N>>;
 
   void push(const T &value) {
-    while (base_type::write_available() == 0) {
+    while (base_type::write_available() == 0) {//检查队列是否已满，若满则等待
       nop_pause();
     }
     bool ok = base_type::push(value);
@@ -42,7 +42,7 @@ public:
     }
   }
 
-  auto capacity() { return N; }
+  auto capacity() { return N; }//获取容量
 
 private:
   void nop_pause() { __asm volatile("pause" : :); }

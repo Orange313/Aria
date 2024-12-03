@@ -74,7 +74,7 @@ public:
     }
 
     MessagePiece get_message_piece(const char *ptr) {
-      DCHECK(ptr <= eof);
+      DCHECK(ptr <= eof);//检查是否处理完所有消息片段
       if (ptr == eof) {
         return MessagePiece(StringPiece());
       }
@@ -95,7 +95,7 @@ public:
     get_deadbeef_ref() = DEADBEEF;
   }
 
-  void resize(std::size_t size) {
+  void resize(std::size_t size) {//调整消息大小，
     DCHECK(data.size() == get_prefix_size());
     data.resize(size);
     set_message_length(data.size());
@@ -104,7 +104,7 @@ public:
 
   char *get_raw_ptr() { return &data[0]; }
 
-  void clear() {
+  void clear() {//仅包含deadbeef，其余部分用0填充
     data = std::string(get_prefix_size(), 0);
     set_message_length(data.size());
     get_deadbeef_ref() = DEADBEEF;
@@ -125,7 +125,7 @@ public:
   }
 
   Iterator begin() {
-    auto eof = &data[0] + data.size();
+    auto eof = &data[0] + data.size();//计算结束位置
     return Iterator(&data[0] + get_prefix_size(), eof);
   }
 
@@ -175,7 +175,7 @@ public:
 
 private:
   void clear_source_node_id() {
-    get_header_ref() &= ~(SOURCE_NODE_ID_MASK << SOURCE_NODE_ID_OFFSET);
+    get_header_ref() &= ~(SOURCE_NODE_ID_MASK << SOURCE_NODE_ID_OFFSET);//位掩码将目标字段清零
   }
 
   void clear_dest_node_id() {
