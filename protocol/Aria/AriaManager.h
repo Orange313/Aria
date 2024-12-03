@@ -143,7 +143,7 @@ public:
         break;
       }
       if (transactions[i]->abort_lock) {
-        transactions[it++].swap(transactions[i]);
+        transactions[it++].swap(transactions[i]);//it用来追踪有效事务的位置，swap将当前位置的事务移到transactions[it]位置
       }
     }
     total_abort.store(it);

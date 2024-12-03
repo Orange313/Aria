@@ -87,7 +87,7 @@ public:
 
     auto message_size = MessagePiece::get_header_size() + key_size +
                         sizeof(uint32_t) + sizeof(uint32_t) + sizeof(epoch) +
-                        sizeof(bool);
+                        sizeof(bool);//tid,tid_offsetuint32_t类型，消息总大小 message_size = 消息头部的大小 + 主键的大小 + 两个 uint32_t 字段的大小 + epoch 字段的大小 + bool 字段的大小
     auto message_piece_header = MessagePiece::construct_message_piece_header(
         static_cast<uint32_t>(AriaMessage::CHECK_REQUEST), message_size,
         table.tableID(), table.partitionID());
@@ -222,7 +222,7 @@ public:
     AriaRWKey &readKey = txns[tid_offset]->readSet[key_offset];
     dec = Decoder(inputPiece.toStringPiece());
     dec.read_n_bytes(readKey.get_value(), value_size);
-    txns[tid_offset]->pendingResponses--;
+    txns[tid_offset]->pendingResponses--;//更新事务响应数量和网络大小
     txns[tid_offset]->network_size += inputPiece.get_message_length();
   }
 
@@ -366,7 +366,7 @@ public:
 
     uint32_t tid, tid_offset;
     bool is_write;
-    bool waw, war, raw;
+    bool waw, war, raw;//冲突类型
 
     DCHECK(inputPiece.get_message_length() ==
            MessagePiece::get_header_size() + sizeof(tid) + sizeof(tid_offset) +

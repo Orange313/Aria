@@ -12,16 +12,16 @@ class AriaRWKey {
 public:
   // local index read bit
 
-  void set_local_index_read_bit() {
+  void set_local_index_read_bit() {//值为1，表示请求来自本地索引
     clear_local_index_read_bit();
     bitvec |= LOCAL_INDEX_READ_BIT_MASK << LOCAL_INDEX_READ_BIT_OFFSET;
   }
 
   void clear_local_index_read_bit() {
-    bitvec &= ~(LOCAL_INDEX_READ_BIT_MASK << LOCAL_INDEX_READ_BIT_OFFSET);
+    bitvec &= ~(LOCAL_INDEX_READ_BIT_MASK << LOCAL_INDEX_READ_BIT_OFFSET);//请求不来自本地索引
   }
 
-  uint32_t get_local_index_read_bit() const {
+  uint32_t get_local_index_read_bit() const {//获取当前本地索引读取标志的值
     return (bitvec >> LOCAL_INDEX_READ_BIT_OFFSET) & LOCAL_INDEX_READ_BIT_MASK;
   }
 
