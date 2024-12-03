@@ -168,7 +168,7 @@ public:
     }
     return 0;
   }
-//generate endpoint from address and port
+//generate sockaddr_in structure to express a IPv4 address and port number
   static sockaddr_in make_endpoint(const char *addr, int port) {
     sockaddr_in serv;
     memset(&serv, 0, sizeof(serv));
