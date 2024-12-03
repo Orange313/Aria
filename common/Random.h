@@ -32,7 +32,7 @@ public:
     return (((uint64_t)next(26) << 27) + next(27)) / (double)(1ULL << 53);
   }
 
-  uint64_t uniform_dist(uint64_t a, uint64_t b) {
+  uint64_t uniform_dist(uint64_t a, uint64_t b) {//[a, b]
     if (a == b)
       return a;
     return next() % (b - a + 1) + a;
